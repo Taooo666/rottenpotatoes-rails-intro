@@ -1,5 +1,5 @@
 class MoviesController < ApplicationController
-
+  
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
@@ -11,51 +11,39 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.uniq.pluck(:rating)#ratings arr
-    #ratings
-    @selected_ratings = []
-    @sort             = ""
-    redirect          = false
-
-
+    @all_ratings = Movie.ratings
     
-    if(params[:ratings])
-      params[:ratings].each {|key, value| @selected_ratings << key}
-      session[:ratings] = @selected_ratings
-    elsif session[:ratings]
-        @selected_ratings = session[:ratings]
-        redirect = true
-      else
-        @selected_ratings = nil
+    if params[:ratings].kind_of?(Hash)
+      params[:ratings] = params[:ratings].keys
     end
-
-    if params[:sort]
-      @sort = params[:sort]
+    
+    @ratings = params[:ratings] || session[:ratings] || @all_ratings
+    @sort = params[:sort] || session[:sort] || nil
+    
+    if params[:sort] != session[:sort] || params[:ratings] != session[:ratings]
       session[:sort] = @sort
-    elsif session[:sort]
-      @sort = session[:sort]
-      redirect = true
-    else
-      @sort = nil
-    end
-    
-    #style
-      if @sort == 'title'
-        @css_title = 'hilite'
-      elsif @sort == 'release_date'
-        @css_release_date = 'hilite'
-      end
-    #
-    
-     if redirect
-
-      redirect_to movies_path :ratings=>@selected_ratings, :sort=>@sort
-    else
-      @movies = Movie.where(:rating => @selected_ratings).order(@sort)
+      session[:ratings] = @ratings
+      flash.keep
+      redirect_to :sort => @sort, :ratings => @ratings and return
     end
 
+    @movies = Movie.where(rating: @ratings)
+    
+    if @sort == "title"
+      @title_hilite = "hilite"
+      @movies = Movie.where(rating: @ratings).order("title")
+    else
+      @title_hilite = ""
+    end
+    
+    if @sort == "release"
+      @release_hilite = "hilite"
+      @movies = Movie.where(rating: @ratings).order("release_date")
+    else
+      @release_hilite = ""
+    end
+    
   end
-
 
   def new
     # default: render 'new' template
