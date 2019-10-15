@@ -16,14 +16,8 @@ class MoviesController < ApplicationController
     if params[:ratings].kind_of?(Hash)
       params[:ratings] = params[:ratings].keys
     end
-    
-    if params[:ratings] != nil
-      @ratings = params[:ratings]
-    elsif session[:ratings] != nil
-      @ratings = session[:ratings]
-    else 
-      @ratings = @all_ratings
 
+    @ratings = params[:ratings] || session[:ratings] || @all_ratings
     @sort = params[:sort] || session[:sort] || nil
     
     if params[:sort] != session[:sort] || params[:ratings] != session[:ratings]
