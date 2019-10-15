@@ -11,7 +11,7 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.ratings
+    @all_ratings = Movie.all_ratings
     
     if params[:ratings].kind_of?(Hash)
       params[:ratings] = params[:ratings].keys
@@ -42,7 +42,6 @@ class MoviesController < ApplicationController
     else
       @release_hilite = ""
     end
-    
   end
 
   def new
