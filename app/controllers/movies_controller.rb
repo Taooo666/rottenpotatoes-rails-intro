@@ -12,13 +12,14 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.all_ratings
+    @sort = params[:sort] || session[:sort] || nil
     
-    if params[:ratings].kind_of?(Hash)
+    if params[:ratings]
       params[:ratings] = params[:ratings].keys
     end
     
     @ratings = params[:ratings] || session[:ratings] || @all_ratings
-    @sort = params[:sort] || session[:sort] || nil
+    
     
     if params[:sort] != session[:sort] || params[:ratings] != session[:ratings]
       session[:sort] = @sort
