@@ -21,13 +21,21 @@ class MoviesController < ApplicationController
     @sort = params[:sort] || session[:sort] || nil
     
     if params[:sort] != session[:sort] || params[:ratings] != session[:ratings]
-      session[:sort] = @sort
       session[:ratings] = @ratings
+      session[:sort] = @sort
+      
       flash.keep
       redirect_to :sort => @sort, :ratings => @ratings and return
     end
 
     @movies = Movie.where(rating: @ratings)
+
+    if @sort == "release"
+      @release_hilite = "hilite"
+      @movies = Movie.where(rating: @ratings).order("release_date")
+    else
+      @release_hilite = ""
+    end
     
     if @sort == "title"
       @title_hilite = "hilite"
@@ -35,13 +43,7 @@ class MoviesController < ApplicationController
     else
       @title_hilite = ""
     end
-    
-    if @sort == "release"
-      @release_hilite = "hilite"
-      @movies = Movie.where(rating: @ratings).order("release_date")
-    else
-      @release_hilite = ""
-    end
+
   end
 
   def new
